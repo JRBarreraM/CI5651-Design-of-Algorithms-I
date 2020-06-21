@@ -1,12 +1,15 @@
+#import numpy as np
 import time
 
 inicio = time.time()
 file = open("ejemplitoInputSAT.txt", "r")
+#file = open("satEntry.txt", "r")
 lines = file.readlines()
 
 numOfClauses = 0
 numOfVariables = 0
 variables = []
+#variables = np.zeros(0)
 clausulas = []
 actualClausula = []
 
@@ -19,6 +22,9 @@ for line in lines:
         numOfVariables = int(line[2])
         numOfClauses = int(line[3])
         variables = [None] * numOfVariables
+        #variables = np.zeros(numOfVariables)
+        #variables[:] = np.NaN
+
     else:
         line =  line.split()
         for elem in line:
@@ -103,7 +109,7 @@ while actClausula != numOfClauses:
     #print()
 
 
-    if timerDone(30):
+    if timerDone(300):
         # No se resolvio
         print('Time\'s Up')
         break
@@ -120,6 +126,7 @@ while actClausula != numOfClauses:
             detectNone = False
             for k in clausulas[actClausula]:
                 var = abs(k)
+                #if variables[var-1] == np.NaN:
                 if variables[var-1] == None:
                     detectNone = True
                     break
@@ -133,6 +140,7 @@ while actClausula != numOfClauses:
                 actVariable = clausulas[actClausula].index(ultFijado[0])
             except:
                 actVariable = clausulas[actClausula].index(-ultFijado[0])
+            #variables[ultFijado[0] - 1] = np.NaN
             variables[ultFijado[0] - 1] = None
             actVariable += 1
 
@@ -143,6 +151,7 @@ while actClausula != numOfClauses:
                     variables[abs(clausulas[actClausula][actVariable]) - 1] = 0
 
                 if checkFail(variables):
+                    #variables[abs(clausulas[actClausula][actVariable]) - 1] = np.NaN
                     variables[abs(clausulas[actClausula][actVariable]) - 1] = None
                     actVariable += 1
                     #print('fail detected')
@@ -151,3 +160,6 @@ while actClausula != numOfClauses:
                     fijados.append([k,actClausula])
         else:
             actVariable += 1
+
+print("Yeah! in only: %f seconds" % (time.time() - inicio))
+print(variables)
