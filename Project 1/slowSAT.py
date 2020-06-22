@@ -1,6 +1,8 @@
 #import numpy as np
 import time
 import sys
+import random
+from copy import deepcopy
 
 #funcion limite de tiempo
 def timerDone(limit):
@@ -23,53 +25,67 @@ def simplificar(clausulas, k):
     clausulas.sort(key=len)
     return clausulas
 
-#
-def case1(clausulasTemp):
-    while clausulasTemp:
-        if timerDone(30):
+#b = a[:]
+#b = list(a)
+def case1(clausulasTemp1):
+    while clausulasTemp1:
+        if timerDone(timeLimit):
             # No se resolvio
             print('Time\'s Up')
             break
 
-        if len(clausulasTemp[0]) == 1:
-            #print(clausulasTemp[0])
-            actVar = clausulasTemp[0][0]
+        if len(clausulasTemp1[0]) == 1:
+            #print(clausulasTemp1[0])
+            actVar = clausulasTemp1[0][0]
             if actVar > 0:
                 variables[actVar - 1] = 1
             else:
                 variables[abs(actVar) - 1] = 0
 
-            clausulasTemp = simplificar(clausulasTemp, actVar)
+            clausulasTemp1 = simplificar(clausulasTemp1, actVar)
         else:
-            return clausulasTemp
+            return clausulasTemp1
 
     print("Yeah! in only: %f seconds" % (time.time() - inicio))
     print(variables)
-    print(clausulasTemp)
+    print(clausulasTemp1)
     sys.exit()
 
 #
-def case2(clausulasTemp, variables, actVar):
-
+def case2(clausulasTemp2, actVar):
     if actVar > 0:
         variables[actVar - 1] = 1
     else:
         variables[abs(actVar) - 1] = 0
+    
+    #print("Antes de simplify: " + str(len(clausulasTemp2)))
+    clausulasTemp2 = simplificar(clausulasTemp2, actVar)
+    #print("Despues de simplify: " + str(len(clausulasTemp2)))
+    #print(actVar)
+    #print()
 
-    clausulasTemp = simplificar(clausulasTemp, actVar)
+    if len(clausulasTemp2) == 0:
+        print("Yeah! in only: %f seconds" % (time.time() - inicio))
+        print(variables)
+        print(clausulasTemp2)
+        sys.exit()
 
-    while clausulasTemp:
-        if timerDone(30):
+    while clausulasTemp2:
+        if timerDone(timeLimit):
             # No se resolvio
             print('Time\'s Up')
             break
 
-        if len(clausulasTemp[0]) == 1:
-            clausulasTemp = case1(clausulasTemp)
+        if len(clausulasTemp2[0]) == 0:
+            #print("oops")
+            return
+        if len(clausulasTemp2[0]) == 1:
+            clausulasTemp2 = case1(clausulasTemp2)
         else:
-            for k in clausulasTemp[0]:
-                case2(clausulasTemp, variables, k)
-            return False
+            for k in random.sample(clausulasTemp2[0], len(clausulasTemp[0])):
+                case2(deepcopy(clausulasTemp2), k)
+            return
+
 
 ############################################################
 #file = open("parabarrera.txt", "r")
@@ -112,9 +128,12 @@ if len(actualClausula) != 0:
 inicio = time.time()
 clausulasTemp = clausulas
 clausulasTemp.sort(key=len)
+timeLimit = 90
 
+
+# MAIN LOOP
 while clausulasTemp:
-    if timerDone(10):
+    if timerDone(timeLimit):
         # No se resolvio
         print('Time\'s Up')
         break
@@ -122,7 +141,10 @@ while clausulasTemp:
     if len(clausulasTemp[0]) == 1:
         clausulasTemp = case1(clausulasTemp)
     else:
-        for k in clausulasTemp[0]:
-            case2(clausulasTemp, variables, k)
-
-print("No se pudo resolver")
+        #print(len(clausulasTemp))
+        for k in random.sample(clausulasTemp[0], len(clausulasTemp[0])):
+            #print(k)
+            case2(deepcopy(clausulasTemp), k)
+        print("Insatisfacible! in only: %f seconds" % (time.time() - inicio))
+        sys.exit()
+print("No se pudo resolver en %d" % (timeLimit))
