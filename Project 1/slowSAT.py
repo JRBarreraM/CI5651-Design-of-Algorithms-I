@@ -25,21 +25,24 @@ def simplificar(clausulas, k):
     clausulas.sort(key=len)
     return clausulas
 
+def encontrarLiteral(clasulas):
+    for k in clasulas:
+        if len(k) == 1:
+            return True
+    return False
+
 def masComun(clausulas):
     apariencias = {}
     for claus in clausulas:
         for var in claus:
-            try:
-                if var in apariencias:
-                    apariencias[var] += 1
-                else:
-                    apariencias[var] = 1
-            except:
-                print(clausulas)
-                print(claus)
-                print(var)
-                sys.exit()
+            if var in apariencias:
+                apariencias[var] += 1
+            else:
+                apariencias[var] = 1
     return max(apariencias, key=apariencias.get)
+
+def seleccionAleatoria(clausulas):
+    return random.choice(random.choice(clausulas))
 
 def case1(clausulasTemp1):
     while clausulasTemp1:
@@ -90,8 +93,10 @@ def case2(clausulasTemp2, actVar):
             if solucion:
                 return solucion
         else:
+            #solucion = case2(deepcopy(clausulasTemp2), seleccionAleatoria(clausulasTemp2))
             solucion = case2(deepcopy(clausulasTemp2), masComun(clausulasTemp2))
             if not solucion:
+                #solucion = case2(deepcopy(clausulasTemp2), -(seleccionAleatoria(clausulasTemp2)))
                 solucion = case2(deepcopy(clausulasTemp2), -(masComun(clausulasTemp2)))
             return solucion
     
@@ -141,13 +146,14 @@ clausulasTemp.sort(key=len)
 timeLimit = 50
 
 # MAIN
+
 if len(clausulasTemp[0]) == 1:
     solucion = case1(clausulasTemp)
     
 if len(clausulasTemp) >= 1:
-    solucion = case2(deepcopy(clausulasTemp), masComun(clausulasTemp))
+    solucion = case2(deepcopy(clausulasTemp), seleccionAleatoria(clausulasTemp))
     if not solucion:
-        solucion = case2(deepcopy(clausulasTemp), -(masComun(clausulasTemp)))
+        solucion = case2(deepcopy(clausulasTemp), -(seleccionAleatoria(clausulasTemp)))
 
 if timerDone(timeLimit):
     # No se resolvio
