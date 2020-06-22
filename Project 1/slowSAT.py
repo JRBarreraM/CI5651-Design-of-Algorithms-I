@@ -25,14 +25,27 @@ def simplificar(clausulas, k):
     clausulas.sort(key=len)
     return clausulas
 
-#b = a[:]
-#b = list(a)
+def masComun(clausulas):
+    apariencias = {}
+    for claus in clausulas:
+        for var in claus:
+            try:
+                if var in apariencias:
+                    apariencias[var] += 1
+                else:
+                    apariencias[var] = 1
+            except:
+                print(clausulas)
+                print(claus)
+                print(var)
+                sys.exit()
+    return max(apariencias, key=apariencias.get)
+
 def case1(clausulasTemp1):
     while clausulasTemp1:
         if timerDone(timeLimit):
             # No se resolvio
-            print('Time\'s Up')
-            break
+            return False
 
         if len(clausulasTemp1[0]) == 1:
             #print(clausulasTemp1[0])
@@ -44,12 +57,9 @@ def case1(clausulasTemp1):
 
             clausulasTemp1 = simplificar(clausulasTemp1, actVar)
         else:
-            return clausulasTemp1
+            return False
 
-    print("Yeah! in only: %f seconds" % (time.time() - inicio))
-    print(variables)
-    print(clausulasTemp1)
-    sys.exit()
+    return True
 
 #
 def case2(clausulasTemp2, actVar):
@@ -65,26 +75,26 @@ def case2(clausulasTemp2, actVar):
     #print()
 
     if len(clausulasTemp2) == 0:
-        print("Yeah! in only: %f seconds" % (time.time() - inicio))
-        print(variables)
-        print(clausulasTemp2)
-        sys.exit()
+        return True
 
     while clausulasTemp2:
         if timerDone(timeLimit):
             # No se resolvio
-            print('Time\'s Up')
-            break
+            return False
 
         if len(clausulasTemp2[0]) == 0:
             #print("oops")
-            return
+            return False
         if len(clausulasTemp2[0]) == 1:
-            clausulasTemp2 = case1(clausulasTemp2)
+            solucion = case1(clausulasTemp2)
+            if solucion:
+                return solucion
         else:
-            for k in random.sample(clausulasTemp2[0], len(clausulasTemp[0])):
-                case2(deepcopy(clausulasTemp2), k)
-            return
+            solucion = case2(deepcopy(clausulasTemp2), masComun(clausulasTemp2))
+            if not solucion:
+                solucion = case2(deepcopy(clausulasTemp2), -(masComun(clausulasTemp2)))
+            return solucion
+    
 
 
 ############################################################
@@ -128,23 +138,27 @@ if len(actualClausula) != 0:
 inicio = time.time()
 clausulasTemp = clausulas
 clausulasTemp.sort(key=len)
-timeLimit = 90
+timeLimit = 50
 
+# MAIN
+if len(clausulasTemp[0]) == 1:
+    solucion = case1(clausulasTemp)
+    
+if len(clausulasTemp) >= 1:
+    solucion = case2(deepcopy(clausulasTemp), masComun(clausulasTemp))
+    if not solucion:
+        solucion = case2(deepcopy(clausulasTemp), -(masComun(clausulasTemp)))
 
-# MAIN LOOP
-while clausulasTemp:
-    if timerDone(timeLimit):
-        # No se resolvio
-        print('Time\'s Up')
-        break
+if timerDone(timeLimit):
+    # No se resolvio
+    print("No se pudo resolver en %d" % (timeLimit))
+    sys.exit()
 
-    if len(clausulasTemp[0]) == 1:
-        clausulasTemp = case1(clausulasTemp)
-    else:
-        #print(len(clausulasTemp))
-        for k in random.sample(clausulasTemp[0], len(clausulasTemp[0])):
-            #print(k)
-            case2(deepcopy(clausulasTemp), k)
-        print("Insatisfacible! in only: %f seconds" % (time.time() - inicio))
-        sys.exit()
-print("No se pudo resolver en %d" % (timeLimit))
+if solucion:
+    print("Yeah! in only: %f seconds" % (time.time() - inicio))
+    print(variables)
+    #print(clausulasTemp)
+    sys.exit()
+
+print("Insatisfacible! in only: %f seconds" % (time.time() - inicio))
+sys.exit()
