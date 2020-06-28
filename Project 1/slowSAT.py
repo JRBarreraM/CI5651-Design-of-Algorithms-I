@@ -22,6 +22,27 @@ def simplificar(clausulas, k):
     clausulas.sort(key=len)
     return clausulas
 
+def actualizarPesos():
+    for var in clausulaAnterior:
+        contadorVariables[var] += 3
+
+def vsids(clausula):
+    pesos = {}
+    for var in clausula:
+        if var in pesos:
+            pesos[var] = contadorVariables[var]
+    return max(pesos, key=pesos.get)
+
+def contarOcurrencias(clausulas):
+    apariencias = {}
+    for claus in clausulas:
+        for var in claus:
+            if var in apariencias:
+                apariencias[var] += 1
+            else:
+                apariencias[var] = 1
+    return apariencias
+
 def masComun(clausulas):
     apariencias = {}
     for claus in clausulas:
@@ -74,17 +95,21 @@ def case2(clausulasTemp2, actVar):
 
         if len(clausulasTemp2[0]) == 0:
             #print("oops")
+            actualizarPesos()
             return False
         if len(clausulasTemp2[0]) == 1:
             solucion = case1(clausulasTemp2)
             if solucion:
                 return solucion
         else:
-            solucion = case2(deepcopy(clausulasTemp2), masComun(clausulasTemp2))
+            actualVar = vsids(clausulasTemp2[0])
+            clausulaAnterior = clausulasTemp2[0]
+            solucion = case2(deepcopy(clausulasTemp2), actualVar)
+            clausulaAnterior = clausulasTemp2[0]
             if not solucion:
-                solucion = case2(deepcopy(clausulasTemp2), -(masComun(clausulasTemp2)))
+                solucion = case2(deepcopy(clausulasTemp2), -(actualVar))
             return solucion
-    
+
 def escribirRespuesta(caso, variables):
     n = len(variables) +1
     if caso == 1:
@@ -123,6 +148,8 @@ numOfVariables = 0
 variables = []
 clausulas = []
 actualClausula = []
+contadorVariables = contarOcurrencias(clausulas)
+clausulaAnterior = []
 
 #leer el archivo 
 for line in lines:
@@ -157,9 +184,12 @@ if len(clausulas[0]) == 1:
     solucion = case1(clausulas)
     
 if len(clausulas) >= 1:
-    solucion = case2(deepcopy(clausulas), seleccionAleatoria(clausulas))
+    actualVar = vsids(clausulas[0])
+    clausulaAnterior = clausulas[0]
+    solucion = case2(deepcopy(clausulas), actualVar)
+    clausulaAnterior = clausulas[0]
     if not solucion:
-        solucion = case2(deepcopy(clausulas), -(seleccionAleatoria(clausulas)))
+        solucion = case2(deepcopy(clausulas), -(actualVar))
 
 if timerDone(timeLimit):
     # No se resolvio

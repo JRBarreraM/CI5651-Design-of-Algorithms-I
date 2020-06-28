@@ -46,7 +46,7 @@ for sudoku in lines:
     tiemposSlow.append(tiempoSlow)
 
     inicio = time.time()
-    os.system("zchaff64/zchaff sat.txt 10")
+    os.system("zchaff64/zchaff sat.txt 10 >> /dev/null")
     print(sudoku)
     tiempoZchaff = time.time() - inicio
     tiemposZchaff.append(tiempoZchaff)
