@@ -28,7 +28,7 @@ if case == 0:
 elif case == -1:
     print("No se pudo resolver")
 else:
-    for i in range(1, numOfVars):
+    for i in range(1, numOfVars+1):
         if int(lines[i].split()[1]) > 0:
             finales.append(i)
     resultado += "%d " % (int(len(finales)**0.25))

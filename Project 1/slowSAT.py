@@ -29,8 +29,7 @@ def actualizarPesos():
 def vsids(clausula):
     pesos = {}
     for var in clausula:
-        if var in pesos:
-            pesos[var] = contadorVariables[var]
+        pesos[var] = contadorVariables[var]
     return max(pesos, key=pesos.get)
 
 def contarOcurrencias(clausulas):
@@ -111,14 +110,14 @@ def case2(clausulasTemp2, actVar):
             return solucion
 
 def escribirRespuesta(caso, variables):
-    n = len(variables) +1
+    n = len(variables)
     if caso == 1:
         print("s cnf 1 %d" % (n))
-        for i in range(1, n):
+        for i in range(1, n+1):
             if variables[i-1] == 1:
-                print("v %d" % (i))
+                print("v %d" % (i+1))
             else:
-                print("v %d" % (-(i)))
+                print("v %d" % (-(i+1)))
 
     elif caso == 0:
         print("s cnf 0 %d" % (n))
@@ -148,7 +147,6 @@ numOfVariables = 0
 variables = []
 clausulas = []
 actualClausula = []
-contadorVariables = contarOcurrencias(clausulas)
 clausulaAnterior = []
 
 #leer el archivo 
@@ -176,8 +174,9 @@ if len(actualClausula) != 0:
 
 inicio = time.time()
 clausulas.sort(key=len)
-timeLimit = 10
+timeLimit = 25
 
+contadorVariables = contarOcurrencias(clausulas)
 # MAIN
 
 if len(clausulas[0]) == 1:
