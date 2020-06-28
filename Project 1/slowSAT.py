@@ -1,4 +1,3 @@
-#import numpy as np
 import time
 import sys
 import random
@@ -13,10 +12,8 @@ def simplificar(clausulas, k):
     i = 0
     while i < len(clausulas):
         if k in clausulas[i]:
-            #print("Estoy en c: %d" % (k))
             del clausulas[i]
         else:
-            #print("No Estoy en c: %d" % (k))
             try:
                 clausulas[i].remove(-k)
             except:
@@ -24,12 +21,6 @@ def simplificar(clausulas, k):
             i += 1
     clausulas.sort(key=len)
     return clausulas
-
-def encontrarLiteral(clasulas):
-    for k in clasulas:
-        if len(k) == 1:
-            return True
-    return False
 
 def masComun(clausulas):
     apariencias = {}
@@ -71,11 +62,7 @@ def case2(clausulasTemp2, actVar):
     else:
         variables[abs(actVar) - 1] = 0
     
-    #print("Antes de simplify: " + str(len(clausulasTemp2)))
     clausulasTemp2 = simplificar(clausulasTemp2, actVar)
-    #print("Despues de simplify: " + str(len(clausulasTemp2)))
-    #print(actVar)
-    #print()
 
     if len(clausulasTemp2) == 0:
         return True
@@ -93,25 +80,47 @@ def case2(clausulasTemp2, actVar):
             if solucion:
                 return solucion
         else:
-            #solucion = case2(deepcopy(clausulasTemp2), seleccionAleatoria(clausulasTemp2))
             solucion = case2(deepcopy(clausulasTemp2), masComun(clausulasTemp2))
             if not solucion:
-                #solucion = case2(deepcopy(clausulasTemp2), -(seleccionAleatoria(clausulasTemp2)))
                 solucion = case2(deepcopy(clausulasTemp2), -(masComun(clausulasTemp2)))
             return solucion
     
+def escribirRespuesta(caso, variables):
+    n = len(variables) +1
+    if caso == 1:
+        print("s cnf 1 %d" % (n))
+        for i in range(1, n):
+            if variables[i-1] == 1:
+                print("v %d" % (i))
+            else:
+                print("v %d" % (-(i)))
 
+    elif caso == 0:
+        print("s cnf 0 %d" % (n))
+        
+    elif caso == -1:
+        print("s cnf -1 %d" % (n))
+    sys.exit()
 
 ############################################################
-#file = open("parabarrera.txt", "r")
-file = open("ejemplitoInputSAT.txt", "r")
-#file = open("satEntry.txt", "r")
-lines = file.readlines()
+if len(sys.argv) < 2:
+    print("No se indico ningun archivo")
+    sys.exit()
+fileName=sys.argv[1]
+
+# Opens the file
+try:
+    data=open(fileName, "r")
+except:
+    print("No se pudo abrir el archivo")
+    sys.exit()
+
+lines = data.readlines()
+data.close()
 
 numOfClauses = 0
 numOfVariables = 0
 variables = []
-#variables = np.zeros(0)
 clausulas = []
 actualClausula = []
 
@@ -124,8 +133,6 @@ for line in lines:
         numOfVariables = int(line[2])
         numOfClauses = int(line[3])
         variables = [None] * numOfVariables
-        #variables = np.zeros(numOfVariables)
-        #variables[:] = np.NaN
 
     else:
         line =  line.split()
@@ -141,30 +148,24 @@ if len(actualClausula) != 0:
     clausulas.append(actualClausula)
 
 inicio = time.time()
-clausulasTemp = clausulas
-clausulasTemp.sort(key=len)
-timeLimit = 50
+clausulas.sort(key=len)
+timeLimit = 10
 
 # MAIN
 
-if len(clausulasTemp[0]) == 1:
-    solucion = case1(clausulasTemp)
+if len(clausulas[0]) == 1:
+    solucion = case1(clausulas)
     
-if len(clausulasTemp) >= 1:
-    solucion = case2(deepcopy(clausulasTemp), seleccionAleatoria(clausulasTemp))
+if len(clausulas) >= 1:
+    solucion = case2(deepcopy(clausulas), seleccionAleatoria(clausulas))
     if not solucion:
-        solucion = case2(deepcopy(clausulasTemp), -(seleccionAleatoria(clausulasTemp)))
+        solucion = case2(deepcopy(clausulas), -(seleccionAleatoria(clausulas)))
 
 if timerDone(timeLimit):
     # No se resolvio
-    print("No se pudo resolver en %d" % (timeLimit))
-    sys.exit()
+    escribirRespuesta(-1, variables)
 
 if solucion:
-    print("Yeah! in only: %f seconds" % (time.time() - inicio))
-    print(variables)
-    #print(clausulasTemp)
-    sys.exit()
+    escribirRespuesta(1, variables)
 
-print("Insatisfacible! in only: %f seconds" % (time.time() - inicio))
-sys.exit()
+escribirRespuesta(0, variables)
