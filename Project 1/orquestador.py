@@ -46,7 +46,7 @@ for sudoku in lines:
     tiemposSlow.append(tiempoSlow)
 
     inicio = time.time()
-    #os.system("echo hola")
+    os.system("zchaff64/zchaff sat.txt 10")
     print(sudoku)
     tiempoZchaff = time.time() - inicio
     tiemposZchaff.append(tiempoZchaff)
@@ -60,3 +60,15 @@ os.system("rm sudoku.txt sat.txt satSolucion.txt")
 print("Tiempo slowSat | Tiempo Zchaff")
 for i in range(len(tiemposSlow)):
     print("%f | %f"  % (tiemposSlow[i], tiemposZchaff[i]))
+
+import matplotlib.pyplot as plt
+
+p1 = plt.plot(tiemposSlow)
+p2 = plt.plot(tiemposZchaff)
+plt.ylabel('Segundos')
+plt.xlabel('Instancia Sudoku')
+plt.title('slowSAT vs Zchaff')
+plt.suptitle('Tiempo Maximo Aceptable 10 segundos')
+plt.legend((p1[0], p2[0]), ('slowSAT', 'Zchaff'))
+plt.grid(True)
+plt.show()
