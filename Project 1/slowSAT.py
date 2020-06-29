@@ -42,18 +42,6 @@ def contarOcurrencias(clausulas):
                 apariencias[var] = 1
     return apariencias
 
-def masComun(clausulas):
-    apariencias = {}
-    for claus in clausulas:
-        for var in claus:
-            if var in apariencias:
-                apariencias[var] += 1
-            else:
-                apariencias[var] = 1
-    return max(apariencias, key=apariencias.get)
-
-def seleccionAleatoria(clausulas):
-    return random.choice(random.choice(clausulas))
 
 def case1(clausulasTemp1):
     while clausulasTemp1:
@@ -174,7 +162,10 @@ if len(actualClausula) != 0:
 
 inicio = time.time()
 clausulas.sort(key=len)
-timeLimit = 25
+timeLimit = 10
+
+if len(sys.argv) > 2:
+    timeLimit = sys.argv[2]
 
 contadorVariables = contarOcurrencias(clausulas)
 # MAIN

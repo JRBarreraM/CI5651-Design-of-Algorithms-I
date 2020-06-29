@@ -23,13 +23,10 @@ for i in range(orden**4):
     sudoku[(i//orden**2)][(i%(orden**2))] = var
     if var != 0:
         variablesFijas.append(i * orden**2 + var)
-#for l in sudoku:
-#    print(l)
 
 numOfClausulas = len(variablesFijas) + (orden**4) + ((orden**8 - orden**6) // 2) + (3 * (orden**8 - orden**6) // 2)
 
 cnfSAT = "p cnf %d %d\n" % (int(orden**6), numOfClausulas)
-#print(variablesFijas)
 
 #Clausulas de Variables Fijas
 for var in variablesFijas:
@@ -45,7 +42,7 @@ for i in range(1, orden**6 + 1, orden**2):
 #Clausulas de Unicidad
 for i in range(1, orden**6 + 1, orden**2):
     fin = i + orden**2
-    for j in range(i, i+9):
+    for j in range(i, i + orden**2):
         for k in range(j+1, fin):
             cnfSAT += "%d %d 0 " % (-j, -k)
     cnfSAT = cnfSAT[:-1] + "\n"
@@ -79,7 +76,7 @@ for i in range(orden):                                      # i = fila de sub-su
     for j in range(orden):                                  # j = columna del sub-sudoku
         a =  []
         for k in range(orden):                              # k = fila dentro del sub-sudoku
-            for l in range(orden):                          # l = casilla en la fila
+            for l in range(orden):                          # l = columna dentro del sub-sudoku
                 for m in range(1, orden**2 +1):             # m = variable de la casilla
                     a.append((i * (orden**5)) + (j * (orden**3)) + (k * orden**4) + (l * orden**2) + m)
         cnfSAT += resuelve(a)

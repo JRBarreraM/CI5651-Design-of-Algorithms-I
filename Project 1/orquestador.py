@@ -4,7 +4,7 @@ import os
 
 if len(sys.argv) < 2:
     print("No file specified")
-    sys.exit()
+    sys.exit():
 fileName=sys.argv[1]
 
 try:
