@@ -33,7 +33,7 @@ else:
             finales.append(i)
     resultado += "%d " % (int(len(finales)**0.25))
     for var in finales:
-        resultado += str((var % 9) + 1)
+        resultado += str((var % 9))
     print(resultado)
 #    for i in range(0,len(resultado),9):
 #        print(resultado[i:i+9])

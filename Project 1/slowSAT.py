@@ -115,9 +115,9 @@ def escribirRespuesta(caso, variables):
         print("s cnf 1 %d" % (n))
         for i in range(1, n+1):
             if variables[i-1] == 1:
-                print("v %d" % (i+1))
+                print("v %d" % (i))
             else:
-                print("v %d" % (-(i+1)))
+                print("v %d" % (-(i)))
 
     elif caso == 0:
         print("s cnf 0 %d" % (n))

@@ -58,4 +58,4 @@ Instancia | Tiempo slowSat | Tiempo Zchaff
 46| 1.877669 | 0.005534
 
 
-![alt text](/Grafica.png?raw=true)
+![grafica](Grafica.png?raw=true)
