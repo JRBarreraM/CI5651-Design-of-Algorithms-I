@@ -58,7 +58,7 @@ Luego verificamos si aun quedan clausulas por resolver, si no, terminamos la eje
 
 Si se cae en el caso2 algoritmo siempre retorna a la primera llamada, y verifica su resultado. Primero se revisa si el tiempo es menor al tiempo limite, si se supero el tiempo se reporta que "No se encontro solucion", si aun queda tiempo se revisa el valor de retorno de caso2. Si retorno False, era Insatisfacible, si retorna True entonces el valor de las variables es una solucion valida. Cabe destacar que al retornar False en los estados intermedios significa que todavia quedan clausulas por resolver. Sin importar cual de los 3 casos anteriores la funcion escribirRespuesta se encarga de mostrar por la salida estandar el resultado en formato cnf, esto es en los casos 0 y -1 constante en memoria y tiempo, mientras que en el caso 1, es lineal en tiempo respecto al numero de variables y constante en memoria.
 
-Llamemos v al numero de variables y c al numero de clausulas. Sabemos que el problema por fuerza bruta es O(2^v) en tiempo.
+Llamemos v al numero de variables y c al numero de clausulas. Sabemos que el problema por fuerza bruta es O(2^v) en tiempo. El mejor caso es cuando puedes resolver todas las clausulas con el caso 1, esto es que luego de simplificar siempre queda al menos una clausula unitaria, si esto sucede se ejecuta simplificar a lo sumo el numero de clausulas, resultando en O(c² log(c)) en tiempo y memoria O(c + v). El peor caso del caso 2, es escoger las variables de la peor manera posible, es decir la manera que genera la mayor cantidad de conflictos, sin embargo la heuristica al asignarle mas peso a las variables que participan al encontrar un conflicto en una clausula, hace que el algoritmo "aprenda" de sus errores, por lo que O(2^v) en tiempo sigue siendo una cota superior pero que, como vemos en las corridas del sudoku, los tiempos son mucho mejores que si hicieramos fuerza bruta. El peor caso en memoria llega a ocupar O(v*c), pues se llega al maximo nivel de recursion, fijando todas las variables y copiando cada vez todas las clausulas -1.
 
 ### saToSudoku
 
@@ -96,7 +96,6 @@ Instacia: 2
 [5, 7, 0, 1, 0, 0, 2, 0, 0]
 [9, 2, 8, 0, 0, 0, 0, 6, 0]
 ```
-Este programa es
 
 ### Orquestador
 
