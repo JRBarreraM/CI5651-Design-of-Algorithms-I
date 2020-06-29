@@ -165,7 +165,7 @@ clausulas.sort(key=len)
 timeLimit = 10
 
 if len(sys.argv) > 2:
-    timeLimit = sys.argv[2]
+    timeLimit = int(sys.argv[2])
 
 contadorVariables = contarOcurrencias(clausulas)
 # MAIN
