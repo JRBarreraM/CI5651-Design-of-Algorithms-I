@@ -4,7 +4,7 @@ import os
 
 if len(sys.argv) < 2:
     print("No file specified")
-    sys.exit():
+    sys.exit()
 fileName=sys.argv[1]
 
 try:
@@ -47,7 +47,7 @@ for sudoku in lines:
 
     inicio = time.time()
     os.system("zchaff64/zchaff sat.txt 10 >> /dev/null")
-    print(sudoku)
+    #print(sudoku)
     tiempoZchaff = time.time() - inicio
     tiemposZchaff.append(tiempoZchaff)
 

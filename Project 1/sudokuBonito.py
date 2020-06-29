@@ -23,13 +23,13 @@ k = 1
 for i in range(len(lines1)):
     print("Instacia: " + str(k))
     print()
-    if not((sudoku2[0] == 'I') or (sudoku2[0] == 'N')):
         
-        orden = lines1[i].split()[0]
-        sudoku1 = lines1[i].split()[1]
-        sudoku2 = lines2[i].split()[1]
+    orden = int(lines1[i].split()[0])
+    sudoku1 = lines1[i].split()[1]
+    temp = lines2[i]
+    if not ((temp[0] == 'I') or (temp[0] == 'N')):
         sudoku1 = [int(x) for x in sudoku1]
-        sudoku2 = [int(x) for x in sudoku2]    
+        sudoku2 = [int(x) for x in temp.split()[1]]
 
         for i in range(0, len(sudoku1), orden**2):
             if (i == 4*orden**2):
@@ -44,7 +44,7 @@ for i in range(len(lines1)):
 
         for i in range(0, len(sudoku1), orden**2):
             if (i == 4*orden**2):
-                print(str(sudoku1[i:i+orden**2]) + " --> " + sudoku2)
+                print(str(sudoku1[i:i+orden**2]) + " --> " + str(temp[:-1]))
             else:
                 print(str(sudoku1[i:i+orden**2]))
         print()
