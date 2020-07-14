@@ -8,19 +8,18 @@ def timerDone(limit):
     return time.time() - inicio >= limit
 
 #
-def simplificar(clausulas, k):
+def simplificar(formula, k):
     i = 0
-    while i < len(clausulas):
-        if k in clausulas[i]:
-            del clausulas[i]
+    while i < len(formula):
+        if k in formula[i]:
+            del formula[i]
         else:
             try:
-                clausulas[i].remove(-k)
+                formula[i].remove(-k)
             except:
                 pass
             i += 1
-    clausulas.sort(key=len)
-    return clausulas
+    return formula
 
 def actualizarPesos():
     for var in clausulaAnterior:
@@ -32,9 +31,9 @@ def vsids(clausula):
         pesos[var] = contadorVariables[var]
     return max(pesos, key=pesos.get)
 
-def contarOcurrencias(clausulas):
+def contarOcurrencias(formula):
     apariencias = {}
-    for claus in clausulas:
+    for claus in formula:
         for var in claus:
             if var in apariencias:
                 apariencias[var] += 1
@@ -43,66 +42,66 @@ def contarOcurrencias(clausulas):
     return apariencias
 
 
-def case1(clausulasTemp1):
-    while clausulasTemp1:
+def case1(formulaTemp1):
+    while formulaTemp1:
         if timerDone(timeLimit):
             # No se resolvio
             return False
 
-        if len(clausulasTemp1[0]) == 1:
-            #print(clausulasTemp1[0])
-            actVar = clausulasTemp1[0][0]
+        if len(formulaTemp1[1]):
+            #print(formulaTemp1[0])
+            actVar = formulaTemp1[0][0]
             if actVar > 0:
-                variables[actVar - 1] = 1
+                verdad[actVar - 1] = 1
             else:
-                variables[abs(actVar) - 1] = 0
+                verdad[abs(actVar) - 1] = 0
 
-            clausulasTemp1 = simplificar(clausulasTemp1, actVar)
+            formulaTemp1 = simplificar(formulaTemp1, actVar)
         else:
             return False
 
     return True
 
 #
-def case2(clausulasTemp2, actVar):
+def case2(formulaTemp2, actVar):
     if actVar > 0:
-        variables[actVar - 1] = 1
+        verdad[actVar - 1] = 1
     else:
-        variables[abs(actVar) - 1] = 0
+        verdad[abs(actVar) - 1] = 0
     
-    clausulasTemp2 = simplificar(clausulasTemp2, actVar)
+    formulaTemp2 = simplificar(formulaTemp2, actVar)
 
-    if len(clausulasTemp2) == 0:
+    if len(formulaTemp2) == 0:
         return True
 
-    while clausulasTemp2:
+    while formulaTemp2:
         if timerDone(timeLimit):
             # No se resolvio
             return False
 
-        if len(clausulasTemp2[0]) == 0:
+        if len(formulaTemp2[0]) == 0:
             #print("oops")
             actualizarPesos()
             return False
-        if len(clausulasTemp2[0]) == 1:
-            solucion = case1(clausulasTemp2)
+        if len(formulaTemp2[0]) == 1:
+            solucion = case1(formulaTemp2)
             if solucion:
                 return solucion
         else:
-            actualVar = vsids(clausulasTemp2[0])
-            clausulaAnterior = clausulasTemp2[0]
-            solucion = case2(deepcopy(clausulasTemp2), actualVar)
-            clausulaAnterior = clausulasTemp2[0]
+            actualVar = vsids(formulaTemp2[0])
+            clausulaAnterior = formulaTemp2[0]
+            solucion = case2(deepcopy(formulaTemp2), actualVar)
+            clausulaAnterior = formulaTemp2[0]
             if not solucion:
-                solucion = case2(deepcopy(clausulasTemp2), -(actualVar))
+                solucion = case2(deepcopy(formulaTemp2), -(actualVar))
             return solucion
 
-def escribirRespuesta(caso, variables):
-    n = len(variables)
+def escribirRespuesta(caso, verdad):
+    n = len(verdad)
     if caso == 1:
         print("s cnf 1 %d" % (n))
         for i in range(1, n+1):
-            if variables[i-1] == 1:
+            if verdad[i-1] == 1:
                 print("v %d" % (i))
             else:
                 print("v %d" % (-(i)))
@@ -132,11 +131,15 @@ data.close()
 
 numOfClauses = 0
 numOfVariables = 0
-variables = []
-clausulas = []
+verdad = []
+formula = {}
+formula[0] = {}
+literales = {}
 actualClausula = []
 clausulaAnterior = []
+contadorVariables = {}
 
+count = 0
 #leer el archivo 
 for line in lines:
     if line[0] == 'c':
@@ -145,47 +148,79 @@ for line in lines:
         line =  line.split()
         numOfVariables = int(line[2])
         numOfClauses = int(line[3])
-        variables = [None] * numOfVariables
+        verdad = [None] * numOfVariables
 
     else:
         line =  line.split()
+        numOfLit = len(line)-1
+        if numOfLit not in formula:
+            formula[numOfLit] = {}
         for elem in line:
             if elem != "0":
-                actualClausula.append(int(elem))
+                lit = int(elem)
+                if lit > 0:
+                    if lit not in literales:
+                        literales[lit] = [(1, count)]
+                    else:
+                        literales[lit].append((1, count))
+                    if lit not in contadorVariables:
+                        contadorVariables[lit] = 1
+                    else:
+                        contadorVariables[lit] += 1
+                else:
+                    if -(lit) not in literales:
+                        literales[-(lit)] = [(-1,count)]
+                    else:
+                        literales[-(lit)].append((-1,count))
+                    if -(lit) not in contadorVariables:
+                        contadorVariables[-(lit)] = 1
+                    else:
+                        contadorVariables[-(lit)] += 1                    
+                actualClausula.append(lit)
             else:
-                clausulas.append(actualClausula)
+                formula[numOfLit][count] = actualClausula
+                count += 1
                 actualClausula = []
 
 #si hay o no un 0 al final
-if len(actualClausula) != 0:
-    clausulas.append(actualClausula)
+numOfLit = len(actualClausula)
+if numOfLit != 0 and numOfLit not in formula:
+    formula[numOfLit] = {}
+    formula[numOfLit][count] = actualClausula
+
+longestClaus = max(formula.keys()
+
+for i in range(1, longestClaus):
+    if i not in formula:
+        formula[i] = {}
 
 inicio = time.time()
-clausulas.sort(key=len)
 timeLimit = 10
 
 if len(sys.argv) > 2:
     timeLimit = int(sys.argv[2])
 
-contadorVariables = contarOcurrencias(clausulas)
 # MAIN
 
-if len(clausulas[0]) == 1:
-    solucion = case1(clausulas)
-    
-if len(clausulas) >= 1:
-    actualVar = vsids(clausulas[0])
-    clausulaAnterior = clausulas[0]
-    solucion = case2(deepcopy(clausulas), actualVar)
-    clausulaAnterior = clausulas[0]
-    if not solucion:
-        solucion = case2(deepcopy(clausulas), -(actualVar))
+if len(formula[1]) > 0:
+    solucion = case1(formula)
+
+for i in range(2, longestClaus):
+    if formula[i]:
+        clausulaEscogida = formula[i][(formula[i].keys())[0]]
+        actualVar = vsids(clausulaEscogida)
+        clausulaAnterior = clausulaEscogida
+        solucion = case2(deepcopy(formula), actualVar)
+        clausulaAnterior = clausulaEscogida
+        if not solucion:
+            solucion = case2(deepcopy(formula), -(actualVar))
+        break
 
 if timerDone(timeLimit):
     # No se resolvio
-    escribirRespuesta(-1, variables)
+    escribirRespuesta(-1, verdad)
 
 if solucion:
-    escribirRespuesta(1, variables)
+    escribirRespuesta(1, verdad)
 
-escribirRespuesta(0, variables)
+escribirRespuesta(0, verdad)
