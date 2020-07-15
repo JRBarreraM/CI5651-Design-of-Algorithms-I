@@ -28,12 +28,14 @@ def simplificar(formula, k):
     for claus in clausulasConK:
         tam = tamOfClausula(formula, claus[0])
         clausula = formula[tam].pop(claus[0], None)
+        print(" claus: " + str(clausula))
         if clausula != None:
             if k * claus[1] > 0:
                 clausulasSatisfechas.append([claus[0], tam, clausula])
             else:
                 #tamOfClaus[claus[0]] -= 1
                 formula[tam -1][claus[0]] = clausula
+        print("tam: " + str(tam) + " -> " + str(tamOfClausula(formula, claus[0])))
     return formula
 
 def actualizarPesos():
@@ -56,7 +58,7 @@ def case1(formulaTemp1):
         if len(formulaTemp1[1]):
             temp = list(formulaTemp1[1].values())
             for var in temp[0]:
-                print(temp[0])
+                #print(temp[0])
                 if verdad[abs(var)-1] == None:
                     if var > 0:
                         verdad[var - 1] = 1
@@ -153,6 +155,7 @@ contadorVariables = {}
 clausulasSatisfechas = []
 tamOfClaus = {}
 count = 0
+numOfLit = 0
 
 #leer el archivo 
 for line in lines:
@@ -166,9 +169,6 @@ for line in lines:
 
     else:
         line =  line.split()
-        numOfLit = len(line)-1
-        if numOfLit not in formula:
-            formula[numOfLit] = {}
         for elem in line:
             if elem != "0":
                 lit = int(elem)
@@ -189,6 +189,9 @@ for line in lines:
                     contadorVariables[lit] += 1
                 actualClausula.append(lit)
             else:
+                numOfLit = len(actualClausula)
+                if numOfLit not in formula:
+                    formula[numOfLit] = {}
                 formula[numOfLit][count] = actualClausula
                 tamOfClaus[count] = numOfLit
                 count += 1
@@ -202,6 +205,7 @@ if numOfLit != 0 and numOfLit not in formula:
     tamOfClaus[count] = numOfLit
 
 longestClaus = max(formula.keys())
+print(longestClaus)
 
 for i in range(1, longestClaus +1):
     if i not in formula:
