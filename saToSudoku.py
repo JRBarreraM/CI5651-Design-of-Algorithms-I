@@ -18,6 +18,7 @@ data.close()
 line =  lines[0].split()
 case = int(line[2])
 numOfVars = int(line[3])
+orden = int(numOfVars**(1/6))
 
 finales = []
 
@@ -31,9 +32,12 @@ else:
     for i in range(1, numOfVars+1):
         if int(lines[i].split()[1]) > 0:
             finales.append(i)
-    resultado += "%d " % (int(len(finales)**0.25))
+    resultado += "%d " % (orden)
     for var in finales:
-        resultado += str((var % 9))
+        temp = (var % orden**2)
+        if temp == 0:
+            temp = orden**2
+        resultado += str(temp)
     print(resultado)
 #    for i in range(0,len(resultado),9):
 #        print(resultado[i:i+9])

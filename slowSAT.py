@@ -7,7 +7,7 @@ from copy import deepcopy
 def timerDone(limit):
     return time.time() - inicio >= limit
 
-def tamOfClausula(formula, key):
+def tamOfClausula(formula, key, clausulasSatisfechas):
     for i in range(longestClaus+1):
         tam = formula[i].get((key))
         if tam != None:
@@ -17,25 +17,20 @@ def tamOfClausula(formula, key):
             return i[1]
     return None
 #
-def simplificar(formula, k):
-    print(k)
-    if (len(formula[0])) > 0:
-        print(formula[0])
-        print(clausulasSatisfechas)
-        print()
-        sys.exit()
+def simplificar(formula, k, clausulasSatisfechas):
     clausulasConK = literales[abs(k)]
     for claus in clausulasConK:
-        tam = tamOfClausula(formula, claus[0])
+        tam = tamOfClausula(formula, claus[0], clausulasSatisfechas)
         clausula = formula[tam].pop(claus[0], None)
-        print(" claus: " + str(clausula))
         if clausula != None:
+            #print(" claus: " + str(clausula))
             if k * claus[1] > 0:
                 clausulasSatisfechas.append([claus[0], tam, clausula])
             else:
                 #tamOfClaus[claus[0]] -= 1
                 formula[tam -1][claus[0]] = clausula
-        print("tam: " + str(tam) + " -> " + str(tamOfClausula(formula, claus[0])))
+            #print("tam: " + str(tam) + " -> " + str(tamOfClausula(formula, claus[0], clausulasSatisfechas)))
+    #print(formula)
     return formula
 
 def actualizarPesos():
@@ -49,7 +44,7 @@ def vsids(clausula):
     return max(pesos, key=pesos.get)
 
 
-def case1(formulaTemp1):
+def case1(formulaTemp1, verdadTemp, clausulasSatisfechas):
     while len(clausulasSatisfechas) != numOfClauses:
         if timerDone(timeLimit):
             # No se resolvio
@@ -59,28 +54,33 @@ def case1(formulaTemp1):
             temp = list(formulaTemp1[1].values())
             for var in temp[0]:
                 #print(temp[0])
-                if verdad[abs(var)-1] == None:
+                if verdadTemp[abs(var)-1] == None:
                     if var > 0:
-                        verdad[var - 1] = 1
+                        verdadTemp[var - 1] = 1
                     else:
-                        verdad[abs(var) - 1] = 0
-                    formulaTemp1 = simplificar(formulaTemp1, var)
+                        verdadTemp[abs(var) - 1] = 0
+                    formulaTemp1 = simplificar(formulaTemp1, var, clausulasSatisfechas)
                     break
         else:
             return False
 
+    global verdad
+    verdad = verdadTemp
+    #print(verdadTemp)
     return True
 
 #
-def case2(formulaTemp2, actVar):
+def case2(formulaTemp2, verdadTemp, clausulasSatisfechas, actVar):
     if actVar > 0:
-        verdad[actVar - 1] = 1
+        verdadTemp[actVar - 1] = 1
     else:
-        verdad[abs(actVar) - 1] = 0
+        verdadTemp[abs(actVar) - 1] = 0
     
-    formulaTemp2 = simplificar(formulaTemp2, actVar)
+    formulaTemp2 = simplificar(formulaTemp2, actVar, clausulasSatisfechas)
     if len(clausulasSatisfechas) == numOfClauses:
         #print(clausulasSatisfechas)
+        global verdad 
+        verdad = verdadTemp
         return True
 
     while len(clausulasSatisfechas) != numOfClauses:
@@ -89,25 +89,24 @@ def case2(formulaTemp2, actVar):
             return False
 
         if len(formulaTemp2[0]) != 0:
-            print("oops")
+            #print("oops")
             actualizarPesos()
             return False
         if len(formulaTemp2[1]) != 0:
-            solucion = case1(formulaTemp2)
+            #print("Caso 2 llama a caso 1")
+            solucion = case1(formulaTemp2, verdadTemp, clausulasSatisfechas)
             if solucion:
                 return solucion
         else:
-            #print(formula)
             for i in range(2, longestClaus +1):
                 if formulaTemp2[i]:
-                    #print(list(formulaTemp2[i].keys()))
                     clausulaEscogida = formulaTemp2[i][list(formulaTemp2[i].keys())[0]]
                     actualVar = vsids(clausulaEscogida)
                     clausulaAnterior = clausulaEscogida
-                    solucion = case2(deepcopy(formulaTemp2), actualVar)
+                    solucion = case2(deepcopy(formulaTemp2), deepcopy(verdadTemp), deepcopy(clausulasSatisfechas), actualVar)
                     clausulaAnterior = clausulaEscogida
                     if not solucion:
-                        solucion = case2(deepcopy(formulaTemp2), -(actualVar))
+                        solucion = case2(deepcopy(formulaTemp2), deepcopy(verdadTemp), deepcopy(clausulasSatisfechas),-(actualVar))
                     return solucion
 
 def escribirRespuesta(caso, verdad):
@@ -205,7 +204,6 @@ if numOfLit != 0 and numOfLit not in formula:
     tamOfClaus[count] = numOfLit
 
 longestClaus = max(formula.keys())
-print(longestClaus)
 
 for i in range(1, longestClaus +1):
     if i not in formula:
@@ -220,23 +218,23 @@ if len(sys.argv) > 2:
 # MAIN
 
 if len(formula[1]) > 0:
-    solucion = case1(formula)
+    solucion = case1(formula, verdad, clausulasSatisfechas)
 
 for i in range(2, longestClaus + 1):
     if formula[i]:
         clausulaEscogida = formula[i][list(formula[i].keys())[0]]
         actualVar = vsids(clausulaEscogida)
         clausulaAnterior = clausulaEscogida
-        solucion = case2(deepcopy(formula), actualVar)
+        solucion = case2(deepcopy(formula), deepcopy(verdad), deepcopy(clausulasSatisfechas), actualVar)
         clausulaAnterior = clausulaEscogida
         if not solucion:
-            solucion = case2(deepcopy(formula), -(actualVar))
+            solucion = case2(deepcopy(formula), deepcopy(verdad), deepcopy(clausulasSatisfechas), -(actualVar))
         break
 
 if timerDone(timeLimit):
     # No se resolvio
     escribirRespuesta(-1, verdad)
-
+    
 if solucion:
     escribirRespuesta(1, verdad)
 
