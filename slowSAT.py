@@ -1,7 +1,5 @@
 import time
 import sys
-import random
-from copy import deepcopy
 
 #funcion limite de tiempo
 def timerDone(limit):
@@ -47,14 +45,6 @@ def actualizarPesos():
         for var in claus:
             #if verdad[abs(var) - 1] == None:
             contadorVariables[var] += 3
-
-def vsids(clausula):
-    pesos = {}
-    for var in clausula:
-        if verdad[abs(var) - 1] == None:
-            pesos[var] = contadorVariables[var]
-    return max(pesos, key=pesos.get)
-
 
 def case1():
     global formula
@@ -102,19 +92,11 @@ def case2(actVar):
             if solucion:
                 return solucion
         else:
-            '''
-            for i in range(2, longestClaus +1):
-                if formula[i]:
-                    clausulaEscogida = formula[i][list(formula[i].keys())[0]]
-                    #actualVar = vsids(clausulaEscogida)
-            '''
             for k in sorted(contadorVariables, key=contadorVariables.get):
                 if verdad[abs(k)-1] == None:
                     actualVar = k
                     break
-            #clausulaAnterior = clausulaEscogida
             solucion = case2(actualVar)
-            #clausulaAnterior = clausulaEscogida
             if not solucion:
                 complicar(actualVar)
                 solucion = case2(-(actualVar))
@@ -235,17 +217,16 @@ if len(sys.argv) > 2:
 if len(formula[1]) > 0:
     solucion = case1()
 
-for i in range(2, longestClaus + 1):
-    if formula[i]:
-        clausulaEscogida = formula[i][list(formula[i].keys())[0]]
-        actualVar = vsids(clausulaEscogida)
-        clausulaAnterior = clausulaEscogida
-        solucion = case2(actualVar)
-        clausulaAnterior = clausulaEscogida
-        if not solucion:
-            complicar(actualVar)
-            solucion = case2(-(actualVar))
-        break
+if not solucion:
+    for k in sorted(contadorVariables, key=contadorVariables.get):
+        actualVar = 0
+        if verdad[abs(k)-1] == None:
+            actualVar = k
+            break
+    solucion = case2(actualVar)
+    if not solucion:
+        complicar(actualVar)
+        solucion = case2(-(actualVar))
 
 if timerDone(timeLimit):
     # No se resolvio
