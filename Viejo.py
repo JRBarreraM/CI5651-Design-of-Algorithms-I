@@ -44,8 +44,6 @@ def contarOcurrencias(clausulas):
 
 
 def case1(clausulasTemp1):
-    global contador1
-    contador1 += 1
     while clausulasTemp1:
         if timerDone(timeLimit):
             # No se resolvio
@@ -67,8 +65,6 @@ def case1(clausulasTemp1):
 
 #
 def case2(clausulasTemp2, actVar):
-    global contador2
-    contador2 += 1
     if actVar > 0:
         variables[actVar - 1] = 1
     else:
@@ -187,9 +183,6 @@ if len(clausulas) >= 1:
     clausulaAnterior = clausulas[0]
     if not solucion:
         solucion = case2(deepcopy(clausulas), -(actualVar))
-
-print(contador1)
-print(contador2)
 
 if timerDone(timeLimit):
     # No se resolvio

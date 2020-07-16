@@ -58,8 +58,6 @@ def vsids(clausula):
 
 def case1():
     global formula
-    global contador1
-    contador1 += 1
     while len(clausulasSatisfechas) != numOfClauses:
         if timerDone(timeLimit):
             # No se resolvio
@@ -81,8 +79,6 @@ def case1():
 
 #
 def case2(actVar):
-    global contador2
-    contador2 += 1
     if actVar > 0:
         verdad[actVar - 1] = 1
     else:
@@ -250,9 +246,6 @@ for i in range(2, longestClaus + 1):
             complicar(actualVar)
             solucion = case2(-(actualVar))
         break
-
-#print(contador1)
-#print(contador2)
 
 if timerDone(timeLimit):
     # No se resolvio
