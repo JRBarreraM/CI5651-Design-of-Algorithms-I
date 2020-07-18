@@ -150,9 +150,6 @@ pilaDeEventos = []
 count = 0
 numOfLit = 0
 
-contador1 = 0
-contador2 = 0
-
 #leer el archivo 
 for line in lines:
     if line[0] == 'c':
